@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+
+    {% from 'dropzone.html' import upload_form %}
+    {{ upload_form() }}
+
+    <div class="actions">
+        <a href="/split" class="btn">Разделить PDF</a>
+        <a href="/merge" class="btn">Объединить PDFs</a>
+        <a href="/convert" class="btn">Преобразовать в JPG</a>
+    </div>
+</div>
+
+{% endblock %}

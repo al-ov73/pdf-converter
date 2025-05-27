@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h2>Разделить PDF</h2>
+
+{% if session.files %}
+    {% for filename, file in session.files.items() %}
+        <div class="file-container">
+            <h3>{{ file.filename }}</h3>
+            <form action="/split-pdf" method="post">
+                <input type="hidden" name="original_filename" value="{{ file.filename }}">
+
+                <!-- Поля формы и превью -->
+                {% from 'preview.html' import pdf_preview %}
+                {{ pdf_preview(file.file_previews, file.filename) }}
+
+                <button type="submit" class="btn">Разделить PDF</button>
+            </form>
+        </div>
+    {% endfor %}
+    {% else %}
+        <a href="/" class="hover-effect"><h4>Загрузите Ваш PDF</h4></a>
+    {% endif %}
+</div>
+
+<script>
+function updateHiddenInput(filename) {
+    const safeFilename = filename.replace('.', '_');
+    const manualInput = document.getElementById(`pages_manual_${safeFilename}`);
+    const hiddenInput = document.getElementById(`selected_pages_${safeFilename}`);
+
+    if (manualInput.value) {
+        hiddenInput.value = manualInput.value;
+
+        // Сброс выделения превью при ручном вводе
+        document.querySelectorAll(`.preview-wrapper[data-filename="${safeFilename}"]`).forEach(wrapper => {
+            wrapper.classList.remove('selected');
+            wrapper.style.border = 'none';
+            wrapper.style.padding = '0';
+        });
+    }
+}
+</script>
+
+<style>
+    .pdf-preview {
+        margin-bottom: 2rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .btn {
+        background-color: #007bff;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 1rem;
+        margin-top: 1rem;
+    }
+
+    .btn:hover {
+        background-color: #0056b3;
+    }
+
+    input[type="text"] {
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        width: 100%;
+        max-width: 400px;
+    }
+
+    .file-container {
+        margin-bottom: 2rem;
+    }
+
+    hr {
+        margin: 2rem 0;
+        border: 0;
+        border-top: 1px solid #eee;
+    }
+</style>
+{% endblock %}
