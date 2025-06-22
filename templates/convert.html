@@ -4,7 +4,7 @@
 <div class="container">
     <h2>Преобразовать PDF в JPG</h2>
     {% if session.files %}
-        <form action="/convert-pdf-to-jpg" method="post">
+        <form action="/convert-pdf-to-jpg" method="post" id="convert-form">
             <div class="form-group">
                 <label>Выберите PDF-файлы для преобразования в JPG:</label>
                 <div class="file-list">
@@ -12,7 +12,9 @@
                         <div class="file-item">
                             <input type="checkbox" id="file_{{ filename|replace('.', '_') }}"
                                    name="filenames"
-                                   value="{{ filename }}">
+                                   value="{{ filename }}"
+                                   checked="checked"
+                                   class="pdf-checkbox">
                             <label for="file_{{ filename|replace('.', '_') }}">{{ filename }}</label>
                         </div>
                     {% endfor %}
@@ -20,13 +22,20 @@
             </div>
             <div class="form-group">
                 <label for="dpi">DPI (качество 72-600):</label>
-                <input type="number" id="dpi" name="dpi" value="300" min="72" max="600">
+                <div class="dpi-buttons">
+                    <button type="button" class="dpi-btn" data-dpi="72">72 (Web)</button>
+                    <button type="button" class="dpi-btn" data-dpi="150">150 (Good)</button>
+                    <button type="button" class="dpi-btn" data-dpi="300">300 (Print)</button>
+                    <button type="button" class="dpi-btn" data-dpi="400">400 (HQ)</button>
+                    <button type="button" class="dpi-btn" data-dpi="600">600 (Max)</button>
+                </div>
+                <input type="number" id="dpi" name="dpi" value="400" min="72" max="600">
             </div>
             <div class="form-group">
                 <label for="output_name">Имя выходного файла:</label>
                 <input type="text" id="output_name" name="output_name" value="converted_images.zip">
             </div>
-            <button type="submit" class="btn">Преобразовать в JPG</button>
+            <button type="submit" class="btn" id="convert-btn">Преобразовать в JPG</button>
         </form>
     {% else %}
         <p>Нет загруженных файлов. <a href="/">Сначала загрузите PDF-файл</a></p>
@@ -82,6 +91,11 @@
     background-color: #45a049;
 }
 
+.btn:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
 input[type="number"],
 input[type="text"] {
     padding: 8px;
@@ -89,6 +103,72 @@ input[type="text"] {
     border-radius: 4px;
     width: 100%;
     max-width: 300px;
+    margin-top: 8px;
+}
+
+.dpi-buttons {
+    display: flex;
+    gap: 8px;
+    margin: 8px 0;
+    flex-wrap: wrap;
+}
+
+.dpi-btn {
+    padding: 6px 12px;
+    background-color: #f0f0f0;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s;
+}
+
+.dpi-btn:hover {
+    background-color: #e0e0e0;
+}
+
+.dpi-btn.active {
+    background-color: #4CAF50;
+    color: white;
+    border-color: #45a049;
 }
 </style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const checkboxes = document.querySelectorAll('.pdf-checkbox');
+    const convertBtn = document.getElementById('convert-btn');
+    const dpiInput = document.getElementById('dpi');
+    const dpiButtons = document.querySelectorAll('.dpi-btn');
+
+    // Проверка состояния чекбоксов при загрузке
+    updateConvertButton();
+
+    // Добавляем обработчики событий для всех чекбоксов
+    checkboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', updateConvertButton);
+    });
+
+    // Обработчики для кнопок DPI
+    dpiButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const dpiValue = this.getAttribute('data-dpi');
+            dpiInput.value = dpiValue;
+
+            // Удаляем активный класс у всех кнопок
+            dpiButtons.forEach(btn => btn.classList.remove('active'));
+            // Добавляем активный класс текущей кнопке
+            this.classList.add('active');
+        });
+    });
+
+    // Активируем кнопку соответствующую значению по умолчанию (400)
+    document.querySelector('.dpi-btn[data-dpi="400"]').classList.add('active');
+
+    function updateConvertButton() {
+        const atLeastOneChecked = Array.from(checkboxes).some(checkbox => checkbox.checked);
+        convertBtn.disabled = !atLeastOneChecked;
+    }
+});
+</script>
 {% endblock %}
