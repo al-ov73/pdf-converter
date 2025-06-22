@@ -4,6 +4,7 @@ import json
 from urllib.parse import quote
 from fastapi.templating import Jinja2Templates
 from fastapi import APIRouter, File, Form, HTTPException, Request, UploadFile
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse, StreamingResponse
 from base64 import b64encode
 from pathlib import Path
@@ -26,6 +27,15 @@ logger = get_logger(__name__)
 app = FastAPI()
 app.add_middleware(SessionMiddleware)
 
+ORIGINS="http://localhost:3000,http://127.0.0.1:3000,http://45.80.71.178:3000,http://45.80.71.178,http://45.80.71.178:80,http://www.memovoz.store,http://memovoz.store,http://www.memovoz.ru,http://memovoz.ru,https://www.memovoz.ru,https://memovoz.ru,https://memovoz.ru/"
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=ORIGINS.split(','),
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "OPTIONS", "DELETE", "PATCH", "PUT"],
+    allow_headers=["*"],
+)
 templates = Jinja2Templates(directory=str(Path(__file__).parent / "templates"))
 templates.env.filters["b64encode"] = lambda x: b64encode(x).decode("utf-8")
 
