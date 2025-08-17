@@ -14,7 +14,7 @@ class Visit:
     country: Optional[str] = None
     region: Optional[str] = None
     city: Optional[str] = None
-    landing_page: Optional[str] = "superpdf.ru"
+    landing_page: Optional[str] = "super-pdf.ru"
     is_new_user: Optional[bool] = None
 
 
@@ -30,7 +30,7 @@ def get_info_by_ip(ip: str, logger: Logger) -> Optional[Visit]:
             country=response.get("country"),
             region=response.get("regionName"),
             city=response.get("city"),
-            landing_page="superpdf.ru",
+            landing_page="super-pdf.ru",
         )
 
     except requests.exceptions.RequestException as e:
@@ -60,7 +60,7 @@ def send_visit_info(request: Request, logger: Logger) -> Optional[dict]:
             verify=True
         )
         response.raise_for_status()
-        logger.info(f"Handeled visit from ip -{visit_data['ip']}-")
+        logger.info(f"Handled visit from ip -{visit_data['ip']}-")
         return response.json()
     except requests.exceptions.RequestException as e:
         logger.info(f"Error sending visit data: {e}")
