@@ -21,6 +21,7 @@ from utils import (
     rotate_pages_in_pdf,
     split_pdf,
 )
+from vizit import send_visit_info
 
 logger = get_logger(__name__)
 
@@ -47,6 +48,7 @@ app.mount("/static", StaticFiles(directory=STATIC_DIR), STATIC_URL)
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request):
     logger.info("Handling request for home page")
+    send_visit_info(request, logger)
     try:
         response = templates.TemplateResponse(
             "index.html",
